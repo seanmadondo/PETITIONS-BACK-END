@@ -644,7 +644,7 @@
           "reviews"
         ],
         "summary": "Retrieves all the reviews authored by a given user.",
-        "description": "Each review is returned with a brief overview of the venue it is for.",
+        "description": "Each review is returned with a brief overview of the venue it is for. \n\n* This endpoint requires authentication so that anonymous users cannot view this information on a user's profile.",
         "security": [
           {
             "UserToken": []
@@ -663,6 +663,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
