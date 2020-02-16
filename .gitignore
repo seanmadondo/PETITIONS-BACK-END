@@ -25,3 +25,7 @@ typings/
 *.tgz
 .yarn-integrity
 .env
+
+# For petition site
+storage/photos/*
+!storage/photos/.gitkeep

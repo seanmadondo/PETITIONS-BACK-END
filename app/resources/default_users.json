@@ -1,17 +1,15 @@
 {
-  "properties": ["username", "email", "givenName", "familyName", "password"],
+  "properties": ["name", "email", "password", "city", "country", "photo_filename"],
   "usersData": [
-    ["bobby1", "bob.roberts@gmail.com", "Bob", "Roberts", "password"],
-    ["black.panther", "black.panther@super.heroes", "T", "Challa", "Wakanda"],
-    ["superman", "superman@super.heroes", "Clark", "Kent", "kryptonite"],
-    ["batman", "dark.knight@super.heroes", "Bruce", "Wayne", "frankmiller"],
-    ["spiderman", "spiderman@super.heroes", "Peter", "Parker", "arachnid"],
-    ["ironman", "ironman@super.heroes", "Tony", "Stark", "robertdowney"],
-    ["captain.america", "captain.america@super.heroes", "Steve", "Rogers", "donaldtrump"],
-    ["dr.manhatten", "dr.manhatten@super.heroes", "Jonathan", "Osterman", "hydrogen"],
-    ["vampire.slayer", "vampire.slayer@super.heroes", "Buffy", "Summers", "sarahgellar"],
-    ["Ozymandias", "Ozymandias@super.villains", "Adrian", "Veidt", "shelley"],
-    ["Rorschach", "Rorschach@super.villains", "Walter", "Kovacs", "Joseph"],
-    ["power.woman", "power.woman@super.heroes", "Jessica", "Jones", "lukecage"]
+    ["Eleanor Shellstrop", "e.shellstrop@hotmail.com", "legitsnack", "Phoenix", "USA", "user_1.jpg"],
+    ["Chidi Anagonye", "c.anagonye@stjohns.edu.au", "peepschili", "Sydney", "Australia", "user_2.png"],
+    ["Tahani Al-Jamil", "tahani.aljamil@ox.ac.uk", "outofthespotlight", "London", "UK", "user_3.gif"],
+    ["Jason Mendoza", "boooooortles@hotmail.com", "boooortles", "Jacksonville", "USA", null],
+    ["Mindy St. Claire", "mindystclaire@gmail.com", "password", "Cincinnati", "USA", null],
+    ["Simone Garnett", "s.garnett@stjohns.edu.au", "nwkvcu33krjf", "Sydney", "Australia", null],
+    ["Steven Peleaz", "pillboi@ymail.com", "jacksonville", "Jacksonville", "USA", null],
+    ["Larry Hemsworth", "larryhemsworth@gmail.com", "not_thor", "Sydney", "Australia", null],
+    ["Kamilah Al-Jamil", "kamilah.aljamil@ox.ac.uk", "ismrrhof", null, null, null],
+    ["John Wheaton", "johnwheaton@gmail.com", "gossip", "Los Angeles", "USA", null]
   ]
 }
