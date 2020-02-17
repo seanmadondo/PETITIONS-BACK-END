@@ -37,7 +37,7 @@ For example:
 SENG365_MYSQL_HOST=db2.csse.canterbury.ac.nz
 SENG365_MYSQL_USER=abc123
 SENG365_MYSQL_PASSWORD=password
-SENG365_MYSQL_DATABASE=abc123_s365
+SENG365_MYSQL_DATABASE=abc123_main
 ```
 
 ## Automated testing
