@@ -2,7 +2,7 @@
 
 ## Overview of the continuous deployment process
 
-1. You hackity hack...
+1. You hackity hack...yaaaaay
 2. You commit your changes to your git repo on `eng-git.canterbury.ac.nz`.
 3. That triggers the GitLab CI runner, which starts a GitLab docker executor on the build VM to build your application within a docker container.
 4. The executor runs the build defined in your `.gitlab-ci.yml` file. Docker compose build follows the `build` steps from `docker-compose.yml` to build the application.
