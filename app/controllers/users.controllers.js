@@ -1,33 +1,39 @@
 const user = require('../models/users.model');
 
 
+
 //Check email address is valid
 function checkEmailValidity(email) {
-    return email.includes('@')
+    return email.includes('@');
 }
 
-exports.register = async function(req, res) {
+exports.create = async function(req, res) {
     console.log('\nRequest to register a new user....');
 
-    if (!checkEmailValidity(req.body.email)) {
-        console.log("Bad email address entered...");
-        res.status(500)
-            .send(`${email} IS NOT A VALID EMAIL ADDRESS`);
-    } else {
-        const name = req.body.name;
-        const email = req.body.email;
-        const password = req.body.password;
-        const city = req.body.city;
-        const country = req.body.country;
-
-        try {
-            const result = await user.register(name, email, password, city, country);
-            res.status(200)
-                .send('User Successfully Registered!');
-        } catch (err) {
+    if ('name' in req.body && 'email' in req.body && 'password' in req.body) {
+        if (req.body.name.length > 0 && checkEmailValidity(req.body.email) === true && req.body.password.length > 0) {
+            try {
+                const insertId = await user.register(req.body);
+                if (insertId === -1) {
+                    res.status(500)
+                        res.statusMessage = "Email already exists!"
+                        .send();
+                } else {
+                    res.status(201)
+                        .json({insertId});
+                        //.send('User successfully registered!');
+                }
+            } catch (err) {
+                res.status(500)
+                    .send(`ERROR Registering User: ${err}`);
+            }
+        } else {
             res.status(500)
-                .send(`ERROR Registering User ${name}: ${err}`);
+                .send('Validation check Failed: Please re-check parameters');
         }
+    } else {
+        res.status(500)
+            .send('Validation check Failed: Name, Email and Password required!');
     }
 };
 
@@ -41,7 +47,7 @@ exports.logout = async function(req, res) {
 
 };
 
-exports.retrieve = async function(req, res) {
+exports.getOne = async function(req, res) {
     console.log("\nRequest to retrieve a user....");
     const id = req.params.id;
     try {
