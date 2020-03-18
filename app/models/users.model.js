@@ -1,7 +1,7 @@
 const db = require('../../config/db');
 const fs = require('mz/fs');
 const passwords = require('../passwords');
-//const randomtoken = require('rand-token');
+const randomToken = require('rand-token');
 
 const photoDirectory = './storage/photos/';
 const defaultPhotoDirectory = './storage/default/';
@@ -46,11 +46,28 @@ exports.register = async function (user) {
     }
 };
 
-exports.login = async function (userID) {
+exports.findUser = async function(user) {
+    //Function to check User exists in the dataBase. Checking by Email.
+    console.log('Checking if User exists....');
+    const conn = await db.getPool().getConnection();
+    const findUserSQL = 'SELECT user_id FROM User WHERE email = ?';
+
+    try {
+        const [result] = await conn.query(findUserSQL, [user.email]);
+        conn.release();
+        return result
+    } catch(err) {
+        console.error(`An error occurred when executing: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
+};
+
+exports.login = async function (user) {
     console.log('Request to login User....');
+    const conn = await db.getPool().getConnection();
+
     const loginSQL = 'UPDATE User SET auth_token = ? WHERE user_id = ?';
-    //const token = randomtoken.generate(32);
-    
+    const token = randomToken.generate(32);
 };
 
 

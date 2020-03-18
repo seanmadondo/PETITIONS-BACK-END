@@ -1,5 +1,5 @@
 const user = require('../models/users.model');
-
+const passwords = require('../passwords');
 
 
 //Check email address is valid
@@ -38,6 +38,24 @@ exports.create = async function(req, res) {
 };
 
 exports.login = async function(req, res) {
+    console.log('\nRequest to login existing user....');
+
+    if ('email' in req.body && 'password' in req.body) {
+        if (req.body.email.length > 0 && checkEmailValidity(req.body.email) === true && req.body.password.length > 0) {
+            try {
+                const checkUserEmail = await user.findUser(req.body);
+                if (checkUserEmail != null) {
+                    const checkPasswordIsCorrect = await passwords.compare(req.body.password, checkUserEmail.password);
+                    if (checkPasswordIsCorrect) {
+                        const loginStatus = await user.login(checkUserEmail);
+                    }
+                }
+            } catch (err) {
+                res.status(500)
+                    .send(`ERROR Login into User: ${err}`);
+            }
+        }
+    }
 
 
 };
