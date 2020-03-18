@@ -13,14 +13,14 @@ exports.create = async function(req, res) {
     if ('name' in req.body && 'email' in req.body && 'password' in req.body) {
         if (req.body.name.length > 0 && checkEmailValidity(req.body.email) === true && req.body.password.length > 0) {
             try {
-                const insertId = await user.register(req.body);
-                if (insertId === -1) {
+                const userId = await user.register(req.body);
+                if (userId === -1) {
                     res.status(400)
                         res.statusMessage = "Email already exists!"
                         .send();
                 } else {
                     res.status(201)
-                        .json({insertId});
+                        .json({userId});
                         //.send('User successfully registered!');
                 }
             } catch (err) {
