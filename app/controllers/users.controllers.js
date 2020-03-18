@@ -15,7 +15,7 @@ exports.create = async function(req, res) {
             try {
                 const insertId = await user.register(req.body);
                 if (insertId === -1) {
-                    res.status(500)
+                    res.status(400)
                         res.statusMessage = "Email already exists!"
                         .send();
                 } else {
@@ -28,11 +28,11 @@ exports.create = async function(req, res) {
                     .send(`ERROR Registering User: ${err}`);
             }
         } else {
-            res.status(500)
+            res.status(400)
                 .send('Validation check Failed: Please re-check parameters');
         }
     } else {
-        res.status(500)
+        res.status(400)
             .send('Validation check Failed: Name, Email and Password required!');
     }
 };
@@ -60,7 +60,7 @@ exports.getOne = async function(req, res) {
                 .send(result);
         }
     } catch (err) {
-        res.status(500)
+        res.status(404)
             .send(`ERROR retrieving user ${id}: ${err}`);
     }
 };
