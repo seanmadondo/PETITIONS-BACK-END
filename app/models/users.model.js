@@ -90,9 +90,16 @@ exports.login = async function (userId) {
 };
 
 
-exports.logout = async function () {
+exports.logout = async function (authKey) {
+    const logoutSqlQuery = 'UPDATE User SET auth_token = NULL WHERE user_id = ?';
+    const conn = await db.getPool().getConnection();
 
-
+    try {
+        await conn.query(logoutSqlQuery, [authKey]);
+    } catch (err) {
+        console.error(`An error occurred when executing: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
 
 };
 

@@ -74,8 +74,18 @@ exports.login = async function(req, res) {
 };
 
 exports.logout = async function(req, res) {
-
-
+    console.log('\nRequest to logout a user............');
+    const id = req.authKey;
+    try {
+        await user.logout(id);
+        res.statusMessage = 'Logout Successful';
+        res.status(200)
+            .send();
+    } catch (err) {
+        if (!err.hasBeenLogged) console.error(err);
+        res.status("Internal System Error")
+            .send();
+    }
 };
 
 exports.getOne = async function(req, res) {
