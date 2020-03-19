@@ -43,21 +43,34 @@ exports.login = async function(req, res) {
     if ('email' in req.body && 'password' in req.body) {
         if (req.body.email.length > 0 && checkEmailValidity(req.body.email) === true && req.body.password.length > 0) {
             try {
-                const checkUserEmail = await user.findUser(req.body);
-                if (checkUserEmail != null) {
-                    const checkPasswordIsCorrect = await passwords.compare(req.body.password, checkUserEmail.password);
+                const userFound = await user.findUser(req.body);
+                if ('userId' in userFound && 'password' in userFound) {
+                    const checkPasswordIsCorrect = await passwords.compare(req.body.password, userFound.password);
                     if (checkPasswordIsCorrect) {
-                        const loginStatus = await user.login(checkUserEmail);
+                        const loginStatus = await user.login(userFound.userId);
+                        res.statusMessage = 'User Logged in OK';
+                        res.status(200)
+                            .json(loginStatus);
+                    } else {
+                        res.status(400)
+                            .send('Password comparison incorrect');
                     }
+                } else {
+                    res.status(400)
+                    res.statusMessage = 'No such User Found';
                 }
             } catch (err) {
                 res.status(500)
                     .send(`ERROR Login into User: ${err}`);
             }
+        } else {
+            res.status(400)
+                .send('Email Password Validation check failed.');
         }
+    } else {
+        res.status(400)
+            .send('Compulsory credential missing. Please Enter both Email and password!');
     }
-
-
 };
 
 exports.logout = async function(req, res) {

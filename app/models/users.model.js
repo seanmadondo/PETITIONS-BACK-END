@@ -47,27 +47,44 @@ exports.register = async function (user) {
 };
 
 exports.findUser = async function(user) {
-    //Function to check User exists in the dataBase. Checking by Email.
+    //Function to check User exists in the dataBase. Checking by Email, return user's password if found
     console.log('Checking if User exists....');
     const conn = await db.getPool().getConnection();
-    const findUserSQL = 'SELECT user_id FROM User WHERE email = ?';
+    const findUserSQL = 'SELECT user_id, password FROM User WHERE email = ?';
 
     try {
         const [result] = await conn.query(findUserSQL, [user.email]);
-        conn.release();
-        return result
+        if (result.length < 1) {
+            return null
+        } else {
+            let userFound = result[0];
+            return {
+                'userId': userFound.user_id,
+                'password': userFound.password
+            }
+        }
     } catch(err) {
         console.error(`An error occurred when executing: \n${err.sql} \nERROR: ${err.sqlMessage}`);
         err.hasBeenLogged = true;
     }
 };
 
-exports.login = async function (user) {
+exports.login = async function (userId) {
     console.log('Request to login User....');
     const conn = await db.getPool().getConnection();
 
     const loginSQL = 'UPDATE User SET auth_token = ? WHERE user_id = ?';
     const token = randomToken.generate(32);
+    try {
+        await conn.query(loginSQL, [token, userId]);
+        return {
+            'userId' : userId,
+            'token' : token
+        }
+    } catch (err) {
+        console.error(`An error occurred when executing: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
 };
 
 
