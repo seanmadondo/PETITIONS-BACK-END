@@ -53,7 +53,7 @@ exports.findUser = async function(user) {
     const findUserSQL = 'SELECT user_id, password FROM User WHERE email = ?';
 
     try {
-        const [result] = await conn.query(findUserSQL, [user.email]);
+        const [result] = conn.query(findUserSQL, [user.email]);
         if (result.length < 1) {
             return null
         } else {
