@@ -44,7 +44,7 @@ exports.login = async function(req, res) {
         if (req.body.email.length > 0 && checkEmailValidity(req.body.email) === true && req.body.password.length > 0) {
             try {
                 const userFound = await user.findUser(req.body);
-                if (userFound != null) {
+                if (userFound !== null) {
                     const checkPasswordIsCorrect = await passwords.compare(req.body.password, userFound.password);
                     if (checkPasswordIsCorrect) {
                         const loginStatus = await user.login(userFound.userId);
@@ -61,7 +61,7 @@ exports.login = async function(req, res) {
                 }
             } catch (err) {
                 res.status(500)
-                    .send(`ERROR Login into User: ${err}`);
+                    .send(`ERROR Logging into User: ${err}`);
             }
         } else {
             res.status(400)
