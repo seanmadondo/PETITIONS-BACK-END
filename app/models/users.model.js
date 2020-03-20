@@ -103,14 +103,45 @@ exports.logout = async function (authKey) {
     }
 };
 
-exports.retrieve = async function (id) {
+exports.loggedInRetrieve = async function (id, authToken) {
     console.log(`Request to retrieve user ${id} from the database...`);
     const conn = await db.getPool().getConnection();
-    const query = 'select * from User where user_id = ?';
-    const [rows] = await conn.query(query, [id]);
-    conn.release();
-    return rows;
+    const getUserSQL = 'SELECT user_id, name, city, country, email, auth_token FROM User WHERE user_id = ?';
+
+    try {
+        const [rows] = await conn.query(getUserSQL, [id]);
+        if (authToken === rows[0].auth_token) {
+            let userInfo = rows[0];
+            return {
+                "name": userInfo.name,
+                "city": userInfo.city,
+                "country": userInfo.country,
+                "email": userInfo.email
+            }
+        } else {
+            let userInfo = rows[0];
+            return {
+                "name": userInfo.name,
+                "city": userInfo.city,
+                "country": userInfo.country
+            }
+        }
+    } catch (err) {
+        console.error(`An error occurred when executing: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
 };
+
+exports.loggedOutRetrieve = async function (id) {
+    console.log(`Request to retrieve user ${id} from the database...`);
+    const conn = await db.getPool().getConnection();
+    const getUserSQL = 'SELECT name, city, country FROM User WHERE user_id = ?';
+    const [rows] = await conn.query(getUserSQL, [id]);
+    conn.release();
+    return [rows];
+};
+
+
 
 exports.change = async function () {
 
@@ -126,7 +157,7 @@ exports.checkAuthToken = async function(authId) {
         if (result === [] || result.length === 0) {
             return 0;                   //false - No Token like this in the database!
         } else {
-            return 1;                   //true - A Token like this already exists!
+            return 1;                   //true - A Token like this exists!
         }
     } catch (err) {
         console.error(`An error occurred when executing: \n${err.sql} \nERROR: ${err.sqlMessage}`);
@@ -146,7 +177,7 @@ exports.checkEmailStatus = async function (email){
         if (result === [] || result.length === 0) {
             return 0;        //false - No Email like this in the database!
         } else {
-            return 1;        //true - An Email like this already exists!
+            return 1;        //true - An Email like this exists!
         }
     } catch (err) {
         console.error(`An error occurred when executing: \n${err.sql} \nERROR: ${err.sqlMessage}`);

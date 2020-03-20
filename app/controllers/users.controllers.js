@@ -104,19 +104,42 @@ exports.logout = async function(req, res) {
 exports.getOne = async function(req, res) {
     console.log("\nRequest to retrieve a user....");
     const id = req.params.id;
-    try {
-        const result = await user.retrieve(id);
-        if (result.length === 0) {
-            res.status(400)
-                .send('Invalid Id');
+    const authToken = req.header("X-Authorization");
+
+    //Check to see if they have included the auth token
+    if (authToken.length > 1) {
+        //attempt to verify auth token
+        const loginStatus = await user.checkAuthToken(authToken);
+        if (loginStatus === 1) {
+            try {
+                const userDetails = await user.loggedInRetrieve(id, authToken);
+                res.statusMessage = 'Retrieve Successful';
+                res.status(201)
+                    .json(userDetails);
+            } catch (err) {
+                res.status(404)
+                    .send(`ERROR retrieving user ${id}: ${err}`);
+            }
         } else {
-            res.status(200)
-                .send(result);
+            res.status(400)
+                .send("Invalid token");
         }
-    } catch (err) {
-        res.status(404)
-            .send(`ERROR retrieving user ${id}: ${err}`);
+    } else {
+        try {
+            const userData = await user.loggedOutRetrieve(id);
+            if (userData.length === 0) {
+                res.status(400)
+                    .send('Invalid Id');
+            } else {
+                res.status(201)
+                    .send(userData);
+            }
+        } catch (err) {
+            res.status(404)
+                .send(`ERROR retrieving user ${id}: ${err}`);
+        }
     }
+
 };
 
 exports.modify = async function(req, res) {
