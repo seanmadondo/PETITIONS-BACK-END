@@ -148,10 +148,18 @@ exports.loggedOutRetrieve = async function (id) {
 
 
 exports.change = async function () {
-
+    console.log("Now Upating User......");
+    const updateSQL = 'UPDATE User SET ? WHERE user_id = ?';
 
 };
 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+//_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+ SUPPORT FUNCTIONS BELOW _+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_//
+//============================================================================================================//
+
+
+
+// _+_+_+_++_+_+_Check if ID exists in the database _+_+_+__+_+_+_+_+_+_+_
 exports.checkIdExists = async function(user_id) {
     console.log("\nChecking if this User exists");
     const conn = await db.getPool().getConnection();

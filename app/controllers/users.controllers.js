@@ -148,6 +148,21 @@ exports.getOne = async function(req, res) {
 };
 
 exports.modify = async function(req, res) {
+    console.log('\nRequest to update User details...........');
+    const id = req.params.id;
+    const authToken = req.header("X-Authorization");
 
+    if ('email' in req.body && 'password' in req.body) {
+        if (req.body.email.length > 0 && checkEmailValidity(req.body.email) === true && req.body.password.length > 0) {
+            const checkEmailNotUsed = await user.checkEmailStatus(req.body.email);
+            if (checkEmailNotUsed === 0) {
+                const checkAuthorisation =  await user.checkAuthToken(authToken);
+                if (checkAuthorisation === 1) {
+
+                }
+            }
+        }
+
+    }
 };
 
