@@ -114,28 +114,28 @@ exports.getOne = async function(req, res) {
             try {
                 const userDetails = await user.loggedInRetrieve(id, authToken);
                 res.statusMessage = 'Retrieve Successful';
-                res.status(201)
+                res.status(200)
                     .json(userDetails);
             } catch (err) {
-                res.status(404)
+                res.status(500)
                     .send(`ERROR retrieving user ${id}: ${err}`);
             }
         } else {
-            res.status(400)
+            res.status(404)
                 .send("Invalid token");
         }
     } else {
         try {
             const userData = await user.loggedOutRetrieve(id);
             if (userData.length === 0) {
-                res.status(400)
+                res.status(404)
                     .send('Invalid Id');
             } else {
-                res.status(201)
+                res.status(200)
                     .send(userData);
             }
         } catch (err) {
-            res.status(404)
+            res.status(500)
                 .send(`ERROR retrieving user ${id}: ${err}`);
         }
     }
