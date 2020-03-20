@@ -136,9 +136,9 @@ exports.loggedOutRetrieve = async function (id) {
     console.log(`Request to retrieve user ${id} from the database...`);
     const conn = await db.getPool().getConnection();
     const getUserSQL = 'SELECT name, city, country FROM User WHERE user_id = ?';
-    const [rows] = await conn.query(getUserSQL, [id]);
+    const [[rows]] = await conn.query(getUserSQL, [id]);
     conn.release();
-    return [rows];
+    return rows;
 };
 
 
