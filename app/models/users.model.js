@@ -148,6 +148,25 @@ exports.change = async function () {
 
 };
 
+exports.checkIdExists = async function(user_id) {
+    console.log("\nChecking if this User exists");
+    const conn = await db.getPool().getConnection();
+    const getIdSQL = "SELECT * FROM User WHERE user_id = ?";
+    try {
+        const [result] = await conn.query(getIdSQL, [user_id]);
+        if (result === [] || result.length === 0) {
+            return 0;                   //false - No User like this in the database!
+        } else {
+            return 1;                   //true - A User like this exists!
+        }
+    } catch (err) {
+        console.error(`An error occurred when executing: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
+};
+
+
+
 //_+_+_+_+_+++_++_+_+_+  Check Auth token exists +_+_+_+_+_++_+_+_+_+_+_+_+_+
 exports.checkAuthToken = async function(authId) {
     const conn = await db.getPool().getConnection();

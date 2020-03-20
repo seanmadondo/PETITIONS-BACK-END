@@ -106,40 +106,45 @@ exports.getOne = async function(req, res) {
     const id = req.params.id;
     const authToken = req.header("X-Authorization");
 
-    //Check to see if they have included the auth token
-    if (authToken.length > 1) {
-        //attempt to verify auth token
-        const loginStatus = await user.checkAuthToken(authToken);
-        if (loginStatus === 1) {
+    const checkId = await user.checkIdExists(id);
+    if (checkId === 1) {
+        //Check to see if they have included the auth token
+        if (authToken.length > 1) {
+            //attempt to verify auth token
+            const loginStatus = await user.checkAuthToken(authToken);
+            if (loginStatus === 1) {
+                try {
+                    const userDetails = await user.loggedInRetrieve(id, authToken);
+                    res.statusMessage = 'Retrieve Successful';
+                    res.status(200)
+                        .json(userDetails);
+                } catch (err) {
+                    res.status(500)
+                        .send(`ERROR retrieving user ${id}: ${err}`);
+                }
+            } else {
+                res.status(404)
+                    .send("No authentication for provided Token");
+            }
+        } else {
             try {
-                const userDetails = await user.loggedInRetrieve(id, authToken);
-                res.statusMessage = 'Retrieve Successful';
-                res.status(200)
-                    .json(userDetails);
+                const userData = await user.loggedOutRetrieve(id);
+                if (userData.length === 0) {
+                    res.status(404)
+                        .send('Invalid Id');
+                } else {
+                    res.status(200)
+                        .send(userData);
+                }
             } catch (err) {
                 res.status(500)
                     .send(`ERROR retrieving user ${id}: ${err}`);
             }
-        } else {
-            res.status(404)
-                .send("Invalid token");
         }
     } else {
-        try {
-            const userData = await user.loggedOutRetrieve(id);
-            if (userData.length === 0) {
-                res.status(404)
-                    .send('Invalid Id');
-            } else {
-                res.status(200)
-                    .send(userData);
-            }
-        } catch (err) {
-            res.status(500)
-                .send(`ERROR retrieving user ${id}: ${err}`);
-        }
+        res.status(404)
+            .send('No user with given Id in the DataBase');
     }
-
 };
 
 exports.modify = async function(req, res) {
