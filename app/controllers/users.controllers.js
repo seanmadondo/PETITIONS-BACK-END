@@ -82,16 +82,16 @@ exports.login = async function(req, res) {
 
 exports.logout = async function(req, res) {
     console.log('\nRequest to logout a user............');
-    const userAuthKey = req.authorisationKey;
+    const userAuthKey = req.header("X-Authorization");
     try {
-        const status = await user.logout(userAuthKey);
-        if (status === true) {
-            res.statusMessage = 'Logout Successful';
+        const findAuthToken = await user.checkAuthToken(userAuthKey);
+        if (findAuthToken === 1) {
+            await user.logout(userAuthKey);
             res.status(200)
-                .send();
+                .send("Logout OK");
         } else {
             res.status(401)
-            res.statusMessage = "Logout NOT successful";
+                .send("Log out FAILED");
         }
     } catch (err) {
         if (!err.hasBeenLogged) console.error(err);

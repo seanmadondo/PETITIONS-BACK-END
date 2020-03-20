@@ -91,21 +91,16 @@ exports.login = async function (userId) {
 
 
 exports.logout = async function (authKey) {
-    const logoutSqlQuery = 'UPDATE User SET auth_token = NULL where user_id = ?';
-    const conn = await db.getPool().getConnection();
 
+    const logoutSqlQuery = 'UPDATE User SET auth_token = NULL where auth_token = ?';
+    const conn = await db.getPool().getConnection();
     try {
         const [result] = await conn.query(logoutSqlQuery, [authKey]);
-        if (result != null) {
-            return true;
-        } else {
-            return false;
-        }
+
     } catch (err) {
         console.error(`An error occurred when executing: \n${err.sql} \nERROR: ${err.sqlMessage}`);
         err.hasBeenLogged = true;
     }
-
 };
 
 exports.retrieve = async function (id) {
@@ -122,6 +117,24 @@ exports.change = async function () {
 
 };
 
+//_+_+_+_+_+++_++_+_+_+  Check Auth token exists +_+_+_+_+_++_+_+_+_+_+_+_+_+
+exports.checkAuthToken = async function(authId) {
+    const conn = await db.getPool().getConnection();
+    const findAuthToken = 'SELECT user_id FROM User WHERE auth_token = ?';
+    try {
+        const [result] = await conn.query(findAuthToken, [authId]);
+        if (result === [] || result.length === 0) {
+            return 0;                   //false - No Token like this in the database!
+        } else {
+            return 1;                   //true - A Token like this already exists!
+        }
+    } catch (err) {
+        console.error(`An error occurred when executing: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
+};
+
+
 //+_+_+_+_+_+ FUNCTION TO CHECK IF EMAIL EXISTS IN DATABASE +_++_+_+_++_+_+_+_+_+
 exports.checkEmailStatus = async function (email){
     console.log('Checking if this email address is in use.....');
@@ -131,7 +144,6 @@ exports.checkEmailStatus = async function (email){
         const [result] = await conn.query(findEmailSQL, [email] );
 
         if (result === [] || result.length === 0) {
-            console.log(result);
             return 0;        //false - No Email like this in the database!
         } else {
             return 1;        //true - An Email like this already exists!
