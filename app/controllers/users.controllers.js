@@ -43,21 +43,28 @@ exports.login = async function(req, res) {
     if ('email' in req.body && 'password' in req.body) {
         if (req.body.email.length > 0 && checkEmailValidity(req.body.email) === true && req.body.password.length > 0) {
             try {
-                const userFound = await user.findUser(req.body);
-                if (userFound !== null) {
-                    const checkPasswordIsCorrect = await passwords.compare(req.body.password, userFound.password);
-                    if (checkPasswordIsCorrect) {
-                        const loginStatus = await user.login(userFound.userId);
-                        res.statusMessage = 'User Logged in OK';
-                        res.status(200)
-                            .json(loginStatus);
+
+                const checkUser = await user.checkEmailStatus(req.body.email);
+                if (checkUser === 1) {                                        //If this email exists......
+                    const userFound = await user.findUser(req.body);
+                    if (userFound !== -1) {
+                        const checkPasswordIsCorrect = await passwords.compare(req.body.password, userFound.password);
+                        if (checkPasswordIsCorrect) {
+                            const loginStatus = await user.login(userFound.userId);
+                            res.statusMessage = 'User Logged in OK';
+                            res.status(200)
+                                .json(loginStatus);
+                        } else {
+                            res.status(400)
+                                .send('Password comparison incorrect');
+                        }
                     } else {
                         res.status(400)
-                            .send('Password comparison incorrect');
+                        res.statusMessage = 'No such User Found';
                     }
                 } else {
                     res.status(400)
-                    res.statusMessage = 'No such User Found';
+                        .send('No user exists with given email address');
                 }
             } catch (err) {
                 res.status(500)
@@ -65,25 +72,31 @@ exports.login = async function(req, res) {
             }
         } else {
             res.status(400)
-                .send('Email Password Validation check failed.');
+                .send('Email & Password Validation check failed.');
         }
     } else {
         res.status(400)
-            .send('Compulsory credential missing. Please Enter both Email and password!');
+            .send('Compulsory credentials missing. Please Enter both Email and password!');
     }
 };
 
 exports.logout = async function(req, res) {
     console.log('\nRequest to logout a user............');
-    const id = req.authKey;
+    const userAuthKey = req.authorisationKey;
     try {
-        await user.logout(id);
-        res.statusMessage = 'Logout Successful';
-        res.status(200)
-            .send();
+        const status = await user.logout(userAuthKey);
+        if (status === true) {
+            res.statusMessage = 'Logout Successful';
+            res.status(200)
+                .send();
+        } else {
+            res.status(401)
+            res.statusMessage = "Logout NOT successful";
+        }
     } catch (err) {
         if (!err.hasBeenLogged) console.error(err);
         res.status("Internal System Error")
+        res.status(500)
             .send();
     }
 };
@@ -106,8 +119,7 @@ exports.getOne = async function(req, res) {
     }
 };
 
-exports.change = async function(req, res) {
-
+exports.modify = async function(req, res) {
 
 };
 

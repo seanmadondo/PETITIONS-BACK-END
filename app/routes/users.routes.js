@@ -11,6 +11,6 @@ module.exports = function (app) {
         .post(user.logout);
 
     app.route(app.rootUrl + '/users/:id')
-        .get(user.getOne);
-        //.patch(user.change);
+        .get(user.getOne)
+        .patch(user.modify);
 };

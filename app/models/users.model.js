@@ -46,18 +46,17 @@ exports.register = async function (user) {
     }
 };
 
+//+_+_+_+_+_+_+_+_+ SUPPORT FUNCTION FOR USER LOGIN - GETS USER WITH ID AND PASSWORD+_+_+_+_+_+_+_+_+_+_+
 exports.findUser = async function(user) {
     //Function to check User exists in the dataBase. Checking by Email, return user's password if found
-    console.log('Checking if User exists....');
+    console.log('Finding user and attempting to return ID and password....');
     const conn = await db.getPool().getConnection();
     const findUserSQL = 'SELECT user_id, password FROM User WHERE email = ?';
 
     try {
         const [result] = await conn.query(findUserSQL, [user.email]);
-        console.log(result);
-        console.log(result.length);
-        if (result === [] || result === null || result.length === 0) {
-            return [];
+        if (result === [] || result.length === 0) {
+            return -1; // No
         } else {
             let userFound = result[0];
             return {
@@ -71,6 +70,7 @@ exports.findUser = async function(user) {
     }
 };
 
+// +_+_+__+_+_+_+_+_+ LOG USER INTO SYSTEM +_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_
 exports.login = async function (userId) {
     console.log('Request to login User....');
     const conn = await db.getPool().getConnection();
@@ -91,11 +91,16 @@ exports.login = async function (userId) {
 
 
 exports.logout = async function (authKey) {
-    const logoutSqlQuery = 'UPDATE User SET auth_token = NULL WHERE user_id = ?';
+    const logoutSqlQuery = 'UPDATE User SET auth_token = NULL where user_id = ?';
     const conn = await db.getPool().getConnection();
 
     try {
-        await conn.query(logoutSqlQuery, [authKey]);
+        const [result] = await conn.query(logoutSqlQuery, [authKey]);
+        if (result != null) {
+            return true;
+        } else {
+            return false;
+        }
     } catch (err) {
         console.error(`An error occurred when executing: \n${err.sql} \nERROR: ${err.sqlMessage}`);
         err.hasBeenLogged = true;
@@ -115,5 +120,25 @@ exports.retrieve = async function (id) {
 exports.change = async function () {
 
 
+};
+
+//+_+_+_+_+_+ FUNCTION TO CHECK IF EMAIL EXISTS IN DATABASE +_++_+_+_++_+_+_+_+_+
+exports.checkEmailStatus = async function (email){
+    console.log('Checking if this email address is in use.....');
+    const conn = await db.getPool().getConnection();
+    const findEmailSQL = 'SELECT user_id FROM User WHERE email = ?';
+    try {
+        const [result] = await conn.query(findEmailSQL, [email] );
+
+        if (result === [] || result.length === 0) {
+            console.log(result);
+            return 0;        //false - No Email like this in the database!
+        } else {
+            return 1;        //true - An Email like this already exists!
+        }
+    } catch (err) {
+        console.error(`An error occurred when executing: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
 };
 
