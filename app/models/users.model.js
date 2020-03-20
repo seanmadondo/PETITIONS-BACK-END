@@ -55,6 +55,7 @@ exports.findUser = async function(user) {
 
     try {
         const [result] = await conn.query(findUserSQL, [user.email]);
+        conn.release();
         if (result === [] || result.length === 0) {
             return -1; // No
         } else {
@@ -79,6 +80,7 @@ exports.login = async function (userId) {
     const token = randomToken.generate(32);
     try {
         await conn.query(loginSQL, [token, userId]);
+        conn.release();
         return {
             'userId' : userId,
             'token' : token
@@ -96,6 +98,7 @@ exports.logout = async function (authKey) {
     const conn = await db.getPool().getConnection();
     try {
         const [result] = await conn.query(logoutSqlQuery, [authKey]);
+        conn.release();
 
     } catch (err) {
         console.error(`An error occurred when executing: \n${err.sql} \nERROR: ${err.sqlMessage}`);
@@ -110,6 +113,7 @@ exports.loggedInRetrieve = async function (id, authToken) {
 
     try {
         const [rows] = await conn.query(getUserSQL, [id]);
+        conn.release();
         if (authToken === rows[0].auth_token) {
             let userInfo = rows[0];
             return {
@@ -154,6 +158,7 @@ exports.checkIdExists = async function(user_id) {
     const getIdSQL = "SELECT * FROM User WHERE user_id = ?";
     try {
         const [result] = await conn.query(getIdSQL, [user_id]);
+        conn.release();
         if (result === [] || result.length === 0) {
             return 0;                   //false - No User like this in the database!
         } else {
@@ -173,6 +178,7 @@ exports.checkAuthToken = async function(authId) {
     const findAuthToken = 'SELECT user_id FROM User WHERE auth_token = ?';
     try {
         const [result] = await conn.query(findAuthToken, [authId]);
+        conn.release();
         if (result === [] || result.length === 0) {
             return 0;                   //false - No Token like this in the database!
         } else {
@@ -192,6 +198,7 @@ exports.checkEmailStatus = async function (email){
     const findEmailSQL = 'SELECT user_id FROM User WHERE email = ?';
     try {
         const [result] = await conn.query(findEmailSQL, [email] );
+        conn.release();
 
         if (result === [] || result.length === 0) {
             return 0;        //false - No Email like this in the database!
