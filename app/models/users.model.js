@@ -180,7 +180,8 @@ exports.change = async function (id, user) {
 
     //get the current user data before the update
     const dataBeforeUpdate = await getCurrentUserData(id);
-    //const updateSQL = 'UPDATE User SET ? WHERE user_id = ?';
+
+    console.log(updateStringList.join(', '));
     const updateSQL = 'UPDATE User SET ' + updateStringList.join(', ') + ' WHERE user_id = ?';
 
     try {
