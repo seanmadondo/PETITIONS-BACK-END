@@ -146,7 +146,6 @@ exports.loggedOutRetrieve = async function (id) {
 };
 
 
-
 exports.change = async function (id, user) {
     console.log("Now Updating User......");
     const conn = await db.getPool().getConnection();

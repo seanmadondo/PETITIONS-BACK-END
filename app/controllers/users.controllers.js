@@ -155,6 +155,8 @@ exports.modify = async function(req, res) {
 
     //check the Validity of the provided data
     let checkUserData = isDataValid(req.body);
+    console.log(checkUserData === true);
+    console.log(checkUserData == true);
 
     if (checkUserData === true) {
         const authorised = await user.checkAuthToken(authToken);
@@ -187,13 +189,13 @@ exports.modify = async function(req, res) {
 //===================================================================================================================
 //+++++++++++++++++++++++++++++++++++++++ HELPER CONTROLLER FUNCTIONS ++++++++++++++++++++++++++++++++++++++++++++++
 
-async function isDataValid(user) {
+function isDataValid(user) {
     let dataApproved = false;
 
     if('email' in user) {
         if (user.email.length > 0 && checkEmailValidity(user.email) === true) {
             //check email is available for use
-            const emailAvailable = await user.checkEmailStatus(user.email);
+            const emailAvailable = user.checkEmailStatus(user.email);
             if (emailAvailable === 0) {
                 dataApproved = true;
             }
@@ -205,6 +207,5 @@ async function isDataValid(user) {
             dataApproved = true;
         }
     }
-
-    return dataApproved;
+    return dataApproved
 }
