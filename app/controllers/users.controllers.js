@@ -108,6 +108,39 @@ exports.getOne = async function(req, res) {
 
     const checkId = await user.checkIdExists(id);
     if (checkId === 1) {
+        const loginStatus = await user.checkAuthToken(authToken);
+        if (loginStatus === 1) {
+            try {
+                const userDetails = await user.loggedInRetrieve(id, authToken);
+                res.statusMessage = 'Retrieve Successful';
+                res.status(200)
+                    .json(userDetails);
+            } catch (err) {
+                res.status(500)
+                    .send(`ERROR retrieving user ${id}: ${err}`);
+            }
+        } else {
+            try {
+                const userData = await user.loggedOutRetrieve(id);
+                res.status(200)
+                    .send(userData);
+            } catch (err) {
+                res.status(500)
+                    .send(`ERROR retrieving user ${id}: ${err}`);
+            }
+        }
+
+    } else {
+        res.status(404)
+            .send('No user with given Id in the DataBase');
+    }
+};
+
+
+
+
+/*    const checkId = await user.checkIdExists(id);
+    if (checkId === 1) {
         //Check to see if they have included the auth token
         if (authToken.length > 1) {
             //attempt to verify auth token
@@ -146,6 +179,8 @@ exports.getOne = async function(req, res) {
             .send('No user with given Id in the DataBase');
     }
 };
+*/
+
 
 exports.modify = async function(req, res) {
     console.log('\nRequest to update User details...........');
