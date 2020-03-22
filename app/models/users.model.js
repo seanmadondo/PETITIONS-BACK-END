@@ -154,46 +154,37 @@ exports.change = async function (id, user) {
     let checkUpdated = false;
 
     //Keep track of things that are to be updated.
-    let updateString = '';
-    let userData = [];
+    let updateStringList = [];
 
     if ('name' in user) {
-        userData.push(user.name);
-        updateString.concat('name');
+        updateStringList.push('name = ' + user.name.toString());
     }
 
     if ('email' in user) {
-        userData.push(user.email);
-        updateString.concat('email');
+        updateStringList.push('email = ' + user.email.toString());
     }
 
     //Hash the new password if it is being updated
     if ("currentPassword" in user) {
         user.password = await passwords.hash(user.password);
-        userData.push(user.password);
-        updateString.concat('password');
+        updateStringList.push('password = ' + user.password.toString());
     }
 
     if ('city' in user) {
-        userData.push(user.city);
-        updateString.concat('city');
+        updateStringList.push('city = ' + user.city.toString());
     }
 
     if ('country' in user) {
-        userData.push(user.country);
-        updateString.concat('country');
+        updateStringList.push('country = ' + user.country.toString());
     }
 
     //get the current user data before the update
     const dataBeforeUpdate = await getCurrentUserData(id);
-
-    console.log(updateString + "   Updates");
-    console.log(userData);
-
-    const updateSQL = 'UPDATE User SET ' + updateString + ' WHERE user_id = ?';
+    //const updateSQL = 'UPDATE User SET ? WHERE user_id = ?';
+    const updateSQL = 'UPDATE User SET ' + updateStringList.join(', ') + ' WHERE user_id = ?';
 
     try {
-        await conn.query(updateSQL, [[userData], [id]]);
+        await conn.query(updateSQL, [parseInt(id)]);
     } catch (err) {
         console.error(`An error occurred when executing CHANGE : \n${err.sql} \nERROR: ${err.sqlMessage}`);
         err.hasBeenLogged = true;
