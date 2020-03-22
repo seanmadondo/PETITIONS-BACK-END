@@ -149,20 +149,62 @@ exports.getOne = async function(req, res) {
 
 exports.modify = async function(req, res) {
     console.log('\nRequest to update User details...........');
+    //Get required details
     const id = req.params.id;
     const authToken = req.header("X-Authorization");
 
-    if ('email' in req.body && 'password' in req.body) {
-        if (req.body.email.length > 0 && checkEmailValidity(req.body.email) === true && req.body.password.length > 0) {
-            const checkEmailNotUsed = await user.checkEmailStatus(req.body.email);
-            if (checkEmailNotUsed === 0) {
-                const checkAuthorisation =  await user.checkAuthToken(authToken);
-                if (checkAuthorisation === 1) {
+    //check the Validity of the provided data
+    let checkUserData = isDataValid(req.body);
 
+    if (checkUserData === true) {
+        const authorised = await user.checkAuthToken(authToken);
+        if (authorised === 1) {
+            try {
+                const updatedStatus = await user.change(id, req.body);
+                if (updatedStatus === 1) {
+                    res.status(200)
+                        .send("User details successfully updated")
+                } else {
+                    res.status(400)
+                        .send("No data has been updated!");
                 }
-            }
-        }
 
+            } catch (err) {
+                res.status(500)
+                    .send(`ERROR modifying user ${id}: ${err}`);
+            }
+        } else {
+            res.status(401)
+                .send("Not authorised!");
+        }
+    } else {
+        res.status(400)
+            .send("Data Provided is invalid!");
     }
+
 };
 
+//===================================================================================================================
+//+++++++++++++++++++++++++++++++++++++++ HELPER CONTROLLER FUNCTIONS ++++++++++++++++++++++++++++++++++++++++++++++
+
+async function isDataValid(user) {
+    let dataApproved = false;
+
+    if('email' in user) {
+        if (user.email.length > 0 && checkEmailValidity(user.email) === true) {
+            //check email is available for use
+            const emailAvailable = await user.checkEmailStatus(user.email);
+            if (emailAvailable === 0) {
+                dataApproved = true;
+            }
+        }
+    }
+
+    if ('password' in user && 'currentPassword' in user) {
+        if (user.password.length > 1 && user.currentPassword.length > 1) {
+            dataApproved = true;
+        }
+    }
+
+    return dataApproved;
+}
