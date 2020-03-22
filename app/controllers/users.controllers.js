@@ -155,8 +155,6 @@ exports.modify = async function(req, res) {
 
     //check the Validity of the provided data
     let checkUserData = isDataValid(req.body);
-    console.log(checkUserData === true);
-    console.log(checkUserData == true);
 
     if (checkUserData === true) {
         const authorised = await user.checkAuthToken(authToken);
@@ -170,7 +168,6 @@ exports.modify = async function(req, res) {
                     res.status(400)
                         .send("No data has been updated!");
                 }
-
             } catch (err) {
                 res.status(500)
                     .send(`ERROR modifying user ${id}: ${err}`);

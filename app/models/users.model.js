@@ -159,24 +159,24 @@ exports.change = async function (id, user) {
 
     if ('name' in user) {
         userData.push(user.name);
-        updateString.concat('name, ');
+        updateString.concat('name');
     }
 
     if ('email' in user) {
         userData.push(user.email);
-        updateString.concat('email, ');
+        updateString.concat('email');
     }
 
     //Hash the new password if it is being updated
     if ("currentPassword" in user) {
         user.password = await passwords.hash(user.password);
         userData.push(user.password);
-        updateString.concat('password, ');
+        updateString.concat('password');
     }
 
     if ('city' in user) {
         userData.push(user.city);
-        updateString.concat('city, ');
+        updateString.concat('city');
     }
 
     if ('country' in user) {
@@ -187,24 +187,25 @@ exports.change = async function (id, user) {
     //get the current user data before the update
     const dataBeforeUpdate = await getCurrentUserData(id);
 
+    console.log(updateString + "   Updates");
+    console.log(userData);
+
     const updateSQL = 'UPDATE User SET ' + updateString + ' WHERE user_id = ?';
 
     try {
-        await conn.query(updateSQL, [userData, id]);
-
-        //get the current user data after the update.
-        const dataAfterUpdate = await getCurrentUserData(id);
-        if (compareTwo(dataBeforeUpdate, dataAfterUpdate) === true) {
-            return 1; // updates have been made
-        } else {
-            return 0;  //updates have not been made to the dataBase
-        }
-
+        await conn.query(updateSQL, [[userData], [id]]);
     } catch (err) {
-        console.error(`An error occurred when executing: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        console.error(`An error occurred when executing CHANGE : \n${err.sql} \nERROR: ${err.sqlMessage}`);
         err.hasBeenLogged = true;
     }
 
+    //get the current user data after the update.
+    const dataAfterUpdate = await getCurrentUserData(id);
+    if (compareTwo(dataBeforeUpdate, dataAfterUpdate) === true) {
+        return 1; // updates have been made
+    } else {
+        return 0;  //updates have not been made to the dataBase
+    }
 
 };
 
@@ -215,6 +216,7 @@ exports.change = async function (id, user) {
 
 //Function to compare two lists.. Return true if they are different
 function compareTwo(array1, array2) {
+    console.log("Comparing two lists for updates....")
     for (let i = 0; i < array1.length; i++) {
         if (array1[i] === array2[i]) {
             return false;
@@ -224,16 +226,15 @@ function compareTwo(array1, array2) {
 }
 
 // Helper function to check if anything has been updated in dataBase
-exports.getCurrentUserData = async function(user_id) {
+getCurrentUserData = async function(user_id) {
     console.log("Getting user details..........");
     const conn = await db.getPool().getConnection();
 
-    const checkUpdatesSQL = 'SELECT name, email, password, city, country  FROM User WHERE user_id = ?';
+    const checkUpdatesSQL = 'SELECT name, email, password, city, country FROM User WHERE user_id = ?';
     try {
         const [results] = await conn.query(checkUpdatesSQL, [user_id]);
         conn.release();
-        const currentData = [results[0].name, results[0].email, results[0].password, results[0].city, results[0].country];
-        return currentData;
+        return [results[0].name, results[0].email, results[0].password, results[0].city, results[0].country];
     } catch (err) {
         console.error(`An error occurred while trying to getCurrentUserData: \n${err.sql} \nERROR: ${err.sqlMessage}`);
         err.hasBeenLogged = true;
