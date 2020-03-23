@@ -4,17 +4,18 @@ const fs = require('mz/fs');
 const photoDirectory = './storage/photos/';
 const defaultPhotoDirectory = './storage/default/';
 
-exports.retrieve = async function () {
+exports.getPhoto = async function () {
 
 };
 
-exports.set = async function () {
+exports.updatePhoto = async function () {
 
 
 
 };
 
-
-exports.delete = async function () {
-
+exports.deletePhoto = async function () {
+    console.log("Request to delete Photo... deletePhoto function executing....");
+    const conn = await db.getPool().getConnection();
+    const deletePhotoSQL = "UPDATE "
 };
