@@ -1,8 +1,9 @@
 const db = require('../../config/db');
 const fs = require('mz/fs');
 const appTools = require('../appTools');
-const photoStorage = './storage/photos/';
 const photoDirectory = './storage/default/';
+const randomToken = require('rand-token');
+
 
 exports.getPhoto = async function (filename) {
     console.log("\nNow getting photo from the database.....");
@@ -20,10 +21,18 @@ exports.getPhoto = async function (filename) {
     }
 };
 
-exports.updatePhoto = async function () {
-
-
-
+exports.updatePhoto = async function (image, imageExtension) {
+    const filename = randomToken.generate(32) + imageExtension;
+    try {
+        await fs.writeFile(photoDirectory + filename, image);
+        return filename;
+    } catch (err) {
+        console.error(`An error occurred when executing updatePhoto : \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+        fs.unlink(photoDirectory + filename)
+            .catch(err => console.error(err));
+        throw err;
+    }
 };
 
 exports.deletePhoto = async function (filename) {
@@ -55,4 +64,21 @@ exports.getPhotoFilename = async function (userId) {
         err.hasBeenLogged = true;
     }
 
+};
+
+exports.setPhotoFilename = async function (userId, filename) {
+    console.log("Update user photo filename.....");
+    const conn = await db.getPool().getConnection();
+    const setPhotoSQL = "UPDATE User SET photo_filename = ? WHERE user_id = ?";
+
+    try {
+        const result  = await conn.query(setPhotoSQL, [filename, userId]);
+        conn.release();
+        if (result.changedRows !== 1) {
+            throw Error("Only one user's photo should be modified");
+        }
+    } catch(err) {
+        console.error(`An error occurred when executing setPhotoFilename: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
 };

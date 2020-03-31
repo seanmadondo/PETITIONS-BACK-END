@@ -32,6 +32,7 @@ exports.retrieve = async function (req, res) {
 
 exports.set = async function (req, res) {
     console.log("Request to update a photo in the database.....");
+    const image = req.body;
     const userId = req.params.id;
     const userAuthKey = req.header("X-Authorization");
 
@@ -56,17 +57,27 @@ exports.set = async function (req, res) {
 
     // Check photo file extension
     const getFileExtension = appTools.getImageExtension(req.header('Content-Type'));
-    if (getFileExtension === null) {
+    if (getFileExtension == null) {
         res.statusMessage = 'Bad Request: type must be image/jpeg OR image/png OR image/gif';
         res.status(400)
             .send();
         return;
     }
 
-    //Check user doesnt already have a profile photo
     try {
+        //Check user doesnt already have a profile photo
         const photoExists = await user_photo.getPhotoFilename(userId);
         if (photoExists) {
+            await user_photo.deletePhoto(photoExists);
+        }
+        const filename = await user_photo.updatePhoto(image, getFileExtension);
+        await user_photo.setPhotoFilename(userId, filename);
+        if (photoExists) {
+            res.statusMessage = 'OK';
+            res.status(200)
+                .send();
+        } else {
+            res.statusMessage = 'Created';
             res.status(201)
                 .send();
         }
