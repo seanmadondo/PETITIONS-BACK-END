@@ -5,7 +5,7 @@ const db = require('../config/db');
 
 // _+_+_+_++_+_+_Check if ID exists in the database _+_+_+__+_+_+_+_+_+_+_
 exports.checkIdExists = async function(user_id) {
-    console.log("\nChecking if this User exists");
+    console.log("Checking if this User exists");
     const conn = await db.getPool().getConnection();
     const getIdSQL = "SELECT * FROM User WHERE user_id = ?";
     try {

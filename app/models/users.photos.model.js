@@ -6,7 +6,7 @@ const randomToken = require('rand-token');
 
 
 exports.getPhoto = async function (filename) {
-    console.log("\nNow getting photo from the database.....");
+    console.log("Executing getPhoto model function.....");
     try {
         if (await fs.exists(photoDirectory + filename)) {
             const image = await fs.readFile(photoDirectory + filename);
@@ -72,7 +72,7 @@ exports.setPhotoFilename = async function (userId, filename) {
     const setPhotoSQL = "UPDATE User SET photo_filename = ? WHERE user_id = ?";
 
     try {
-        const result  = await conn.query(setPhotoSQL, [filename, userId]);
+        const [result]  = await conn.query(setPhotoSQL, [filename, userId]);
         conn.release();
         if (result.changedRows !== 1) {
             throw Error("Only one user's photo should be modified");

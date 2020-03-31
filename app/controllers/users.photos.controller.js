@@ -4,13 +4,13 @@ const appTools = require('../appTools');
 
 
 exports.retrieve = async function (req, res) {
-    console.log("Request to retrieve a photo from the database.....");
+    console.log("\nRequest to retrieve a photo from the database.....");
     const userId = req.params.id;
 
     try {
         const filename = await user_photo.getPhotoFilename(userId);
         if (filename === null) {
-            res.statusMessage = 'Not Found';
+            res.statusMessage = 'Not Found!';
             res.status(404)
                 .send();
         } else {
@@ -31,7 +31,7 @@ exports.retrieve = async function (req, res) {
 
 
 exports.set = async function (req, res) {
-    console.log("Request to update a photo in the database.....");
+    console.log("\nRequest to update a photo in the database.....");
     const image = req.body;
     const userId = req.params.id;
     const userAuthKey = req.header("X-Authorization");
