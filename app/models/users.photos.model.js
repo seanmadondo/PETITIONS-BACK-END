@@ -11,7 +11,7 @@ exports.getPhoto = async function (filename) {
         if (await fs.exists(photoDirectory + filename)) {
             const image = await fs.readFile(photoDirectory + filename);
             const mimeType = appTools.getImageMimetype(filename);
-            return { image, mimeType };
+            return {image, mimeType};
         } else {
             return null
         }
