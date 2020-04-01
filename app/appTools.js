@@ -10,6 +10,8 @@ exports.getImageExtension = function (mimeType) {
     switch (mimeType) {
         case 'image/jpeg':
             return '.jpeg';
+        case 'image/jpg':
+            return '.jpeg';
         case 'image/png':
             return '.png';
         case 'image/gif':

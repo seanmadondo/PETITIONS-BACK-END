@@ -117,7 +117,7 @@ exports.delete = async function (req, res) {
                     .send();
             } else {
                 await Promise.all([
-                    user_photo.deletePhoto(photoFilename),
+                    user_photo.deletePhoto(photoFilename, userId),
                     user_photo.updatePhoto(userId, null)
                 ]);
                 res.statusMessage = "Deleted OK";

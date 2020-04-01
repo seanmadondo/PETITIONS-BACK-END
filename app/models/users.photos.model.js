@@ -35,9 +35,14 @@ exports.updatePhoto = async function (image, imageExtension) {
     }
 };
 
-exports.deletePhoto = async function (filename) {
+exports.deletePhoto = async function (filename, id) {
     console.log("Request to delete Photo... deletePhoto function executing....");
+    const conn = await db.getPool().getConnection();
+    const deletePhotoSQL = "UPDATE User SET photo_filename = NULL WHERE user_id = ?";
     try {
+        await conn.query(deletePhotoSQL, [id]);
+        conn.release();
+
         if (await fs.exists(photoDirectory + filename)) {
             fs.unlink(photoDirectory + filename);
         }
