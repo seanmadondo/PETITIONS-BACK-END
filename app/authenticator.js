@@ -24,7 +24,7 @@ exports.checkIdExists = async function(user_id) {
 
 //+_+_+_+_+_+_+_+ FUNCTION TO CHECK ID BY AUTH _+_+_+_+_+_+_+_+_+_+_
 exports.checkIdByAuthToken = async function(id, authId) {
-    console.log("Check authToken ...return ID");
+    console.log("Check authToken against ID");
     const conn = await db.getPool().getConnection();
     const findAuthToken = 'SELECT auth_token FROM User WHERE user_id = ?';
     try {
@@ -60,6 +60,22 @@ exports.checkAuthToken = async function(authId) {
         err.hasBeenLogged = true;
     }
 };
+
+//_+_++_+_+_+_+_+_+_+_+_+_+_+_ CHECK AUTH TOKEN - RETURN user_id _+_+_+_+_+_+_+_+_+_++_+_+_+
+exports.getUserFromAuth = async function(authId) {
+    console.log("\nGetting user_id from auth_token......");
+    const conn = await db.getPool().getConnection();
+    const findUserSQL = 'SELECT user_id FROM User WHERE auth_token = ?';
+    try {
+        const [result] = await conn.query(findUserSQL, [authId]);
+        conn.release();
+        return result[0].user_id;
+    } catch (err) {
+        console.error(`An error occurred when executing getUserFromAuth: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
+};
+
 
 
 //+_+_+_+_+_+ FUNCTION TO CHECK IF EMAIL EXISTS IN DATABASE +_++_+_+_++_+_+_+_+_+

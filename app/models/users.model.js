@@ -231,19 +231,6 @@ exports.change = async function (id, user) {
 //============================================================================================================//
 
 
-//Function to compare two lists.. Return true if they are different
-/*function compareTwo(array1, array2) {
-    console.log("Comparing two lists for updates....")
-    let isDifferent = false;
-
-    for (let i = 0; i < array1.length; i++) {
-        if (array1[i] === array2[i]) {
-            isDifferent = true;
-        }
-    }
-    return false;
-}
- */
 
 // Helper function to check if anything has been updated in dataBase
 getCurrentUserData = async function(user_id) {
@@ -323,3 +310,18 @@ exports.checkEmailStatus = async function (email){
     }
 };
 
+//function to get the authorId given the name of the author
+exports.getAuthName = async function (id) {
+    console.log('>>> Getting the authors Id from the name given......');
+    const conn = await db.getPool().getConnection();
+    const getAuthNameSQL = "SELECT name FROM User WHERE user_id = ?";
+
+    try {
+        const [authName] = await conn.query(getAuthNameSQL, [id]);
+        conn.release();
+        return authName[0].name;
+    } catch (err) {
+        console.error(`An error occurred when executing getAuthName : \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
+};

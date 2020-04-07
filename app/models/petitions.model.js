@@ -6,8 +6,8 @@ const defaultPhotoDirectory = './storage/default/';
 
 const bcrypt = require('bcrypt');
 
-exports.getPetitions = async function () {
-    console.log(">>> Now getting petitions from the database.....");
+exports.getAllPetitions = async function () {
+    console.log(">>> Now getting all Petitions from the database.....");
     const conn = await db.getPool().getConnection();
     const getPetitionsSQL = "SELECT petition_id, title, category_id, author_id FROM Petition";
 
@@ -34,15 +34,36 @@ exports.getPetitions = async function () {
     }
 };
 
-exports.postPetition = async function () {
 
+exports.postPetition = async function (user, authId, dateToday) {
+    console.log(">>> Executing postPetition to post petition to the database......");
+    const conn = await db.getPool().getConnection();
+    const postPetitionSQL = "INSERT INTO Petition (title, description, author_id, category_id, created_date, closing_date) values (?, ?, ?, ?, ?, ?)";
 
+    const petitionData = [
+        user.title,
+        user.description,
+        authId,
+        user.categoryId,
+        dateToday,
+        null
+    ];
 
+    if ("closingDate" in user) {
+        petitionData[5] = user.closingDate;
+    }
+
+    try {
+        const [results] = await conn.query(postPetitionSQL, petitionData);
+        conn.release();
+        return results.insertId;
+    } catch (err) {
+        console.error(`An error occurred when executing postPetition: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
 };
 
 exports.getOnePetition = async function () {
-
-
 
 
 };
@@ -50,19 +71,15 @@ exports.getOnePetition = async function () {
 exports.alterPetition = async function () {
 
 
-
-
 };
 
 exports.deletePetition = async function () {
-
 
 
 };
 
 
 exports.retrievePetitions = async function () {
-
 
 
 };
@@ -102,6 +119,22 @@ getCatAndAuth = async function (categoryId, authorId) {
 
     } catch (err) {
         console.error(`An error occurred when executing getCatAndAuth : \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
+};
+
+//function to get the Category name given the id of the Category
+exports.getCatName = async function (id) {
+    console.log('>>> Getting the Category name from the Id given......');
+    const conn = await db.getPool().getConnection();
+    const getCatNameSQL = "SELECT name FROM Category WHERE category_id = ?";
+
+    try {
+        const [catName] = await conn.query(getCatNameSQL, [id]);
+        conn.release();
+        return catName[0].name;
+    } catch (err) {
+        console.error(`An error occurred when executing getCatName : \n${err.sql} \nERROR: ${err.sqlMessage}`);
         err.hasBeenLogged = true;
     }
 };
