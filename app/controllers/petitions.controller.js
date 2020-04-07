@@ -109,7 +109,7 @@ exports.add = async function(req, res){
     }
 
     //Check to see if user has included auth token
-    if (authToken.length === "") {
+    if (authToken === "") {
         res.statusMessage = "Unauthorised!";
         res.status(401)
             .send();
