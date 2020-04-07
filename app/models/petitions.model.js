@@ -63,9 +63,40 @@ exports.postPetition = async function (user, authId, dateToday) {
     }
 };
 
-exports.getOnePetition = async function () {
+exports.getOnePetition = async function (id) {
+    console.log(">>> Now getting petitions from the database......");
+    const conn = await db.getPool().getConnection();
+    const getPetitionSQL = "SELECT petition_id, title, category_id, author_id, description, created_date, closing_date FROM Petition WHERE petition_id = ?";
 
 
+    try {
+        const [results] = await conn.query(getPetitionSQL, [id]);
+        conn.release();
+
+        let petitionDetails = results[0];
+        //Get the author name and category name -- returns [authorName, categoryName]
+        const authAndCatList = await getCatAndAuth(petitionDetails.category_id, petitionDetails.author_id);
+        //Get the User City and Country -- returns [city, country]
+        const cityAndCountryList = await getCityCountry(petitionDetails.author_id);
+
+        return {
+            "petitionId": id,
+            "title": petitionDetails.title,
+            "category": authAndCatList[1],
+            "authorName": authAndCatList[0],
+            "signatureCount": await numSignatures(id),
+            "description": petitionDetails.description,
+            "authorId": petitionDetails.author_id,
+            "authorCity": cityAndCountryList[0],
+            "authorCountry": cityAndCountryList[1],
+            "createdDate": petitionDetails.created_date,
+            "closingDate": petitionDetails.closing_date
+        }
+
+    } catch (err) {
+        console.error(`An error occurred when executing getOnePetition: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
 };
 
 exports.alterPetition = async function () {
@@ -123,6 +154,25 @@ getCatAndAuth = async function (categoryId, authorId) {
     }
 };
 
+//Support Function for getOnePetition - returns the users city and country
+getCityCountry = async function (userId) {
+    console.log(">>> Getting the User's City and Country from the database.....");
+    const conn = await db.getPool().getConnection();
+    const getCityCountrySQL = "SELECT city, country FROM User WHERE user_id = ?";
+
+    try {
+        const [results] = await conn.query(getCityCountrySQL, [userId]);
+        conn.release();
+
+        return [results[0].city, results[0].country];
+
+    } catch (err) {
+        console.error(`An error occurred when executing getCityCountry : \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
+
+};
+
 //function to get the Category name given the id of the Category
 exports.getCatName = async function (id) {
     console.log('>>> Getting the Category name from the Id given......');
@@ -135,6 +185,24 @@ exports.getCatName = async function (id) {
         return catName[0].name;
     } catch (err) {
         console.error(`An error occurred when executing getCatName : \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
+};
+
+exports.checkPetitionExists = async function(petitionId) {
+    console.log(">>> Checking if this Petition exists......");
+    const conn = await db.getPool().getConnection();
+    const getPetitionSQL = "SELECT * FROM Petition WHERE petition_id = ?";
+    try {
+        const [result] = await conn.query(getPetitionSQL, [petitionId]);
+        conn.release();
+        if (result === [] || result.length === 0) {
+            return 0;                   //false - No User like this in the database!
+        } else {
+            return 1;                   //true - A User like this exists!
+        }
+    } catch (err) {
+        console.error(`An error occurred while executing checkPetitionExists: \n${err.sql} \nERROR: ${err.sqlMessage}`);
         err.hasBeenLogged = true;
     }
 };

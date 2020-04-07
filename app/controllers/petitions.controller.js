@@ -137,7 +137,25 @@ exports.add = async function(req, res){
 };
 
 exports.retrieve = async function(req, res){
+    console.log("\n>>> Request to get detailed information about a petition........");
 
+    //Check if petition Exists.
+    const checkPetition = await petitions.checkPetitionExists(req.params.id)
+    if (checkPetition === 0) {
+        res.statusMessage = "Not Found";
+        res.status(404)
+            .send();
+        return;
+    }
+    try {
+        const getPetition = await petitions.getOnePetition(req.params.id);
+        res.statusMessage = "Success";
+        res.status(200)
+            .json(getPetition);
+    } catch (err) {
+        res.status(500)
+            .send(`ERROR Retrieving a Petition: ${err}`);
+    }
 
 };
 
