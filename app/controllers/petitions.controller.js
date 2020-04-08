@@ -223,9 +223,37 @@ exports.change = async function(req, res){
 };
 
 exports.delete = async function(req, res){
+    console.log("\n>>> Request to delete a Petition.....");
+    const authToken = req.header("X-Authorization");
 
+    //Check if this petition exists...
+    const checkPetition = await petitions.checkPetitionExists(req.params.id)
+    if (checkPetition === 0) {
+        res.statusMessage = "Not Found";
+        res.status(404)
+            .send();
+    }
 
+    //Check to see if user has included auth token
+    if (authToken === "") {
+        res.statusMessage = "Unauthorised!";
+        res.status(401)
+            .send();
+    }
 
+    //check that this petition has an author_id that matches with user_id of the editor
+    const authorOfPetition = await petitions.getAuthIdByPetition(req.params.id);
+    const getUserIdFromToken = await authenticator.getUserFromAuth(authToken);
+    if (authorOfPetition === getUserIdFromToken) {
+        await petitions.deletePetition(req.params.id);
+        res.statusMessage = "OK";
+        res.status(200)
+            .send();
+    } else {
+        res.statusMessage = "Forbidden";
+        res.status(403)
+            .send();
+    }
 };
 
 exports.retrieveCat = async function(req, res){

@@ -116,6 +116,7 @@ exports.alterPetition = async function (id, petition) {
         const alterPetitionSQL = "UPDATE Petition SET title = ?, description = ?, category_id = ?, closing_date = ? WHERE petition_id = ?";
         try {
             await conn.query(alterPetitionSQL, petitionData);
+            conn.release();
         } catch (err) {
             console.error(`An error occurred when executing alterPetition1: \n${err.sql} \nERROR: ${err.sqlMessage}`);
             err.hasBeenLogged = true;
@@ -125,6 +126,7 @@ exports.alterPetition = async function (id, petition) {
         const alterPetitionSQL = "UPDATE Petition SET title = ?, description = ?, closing_date = ? WHERE petition_id = ?";
         try {
             await conn.query(alterPetitionSQL, petitionData);
+            conn.release();
         } catch (err) {
             console.error(`An error occurred when executing alterPetition2: \n${err.sql} \nERROR: ${err.sqlMessage}`);
             err.hasBeenLogged = true;
@@ -133,7 +135,20 @@ exports.alterPetition = async function (id, petition) {
 
 };
 
-exports.deletePetition = async function () {
+exports.deletePetition = async function (id) {
+    console.log(">>> Now deleting Petition from database......");
+    const conn = await db.getPool().getConnection();
+    const deletePetitionSQL = "DELETE FROM Petition WHERE petition_id = ?";
+    const deleteSignatureSQL = "DELETE FROM Signature WHERE petition_id = ?";
+
+    try {
+        await conn.query(deletePetitionSQL, [id]);
+        await conn.query(deleteSignatureSQL, [id]);
+        conn.release();
+    } catch (err) {
+        console.error(`An error occurred when executing deletePetition: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
 
 
 };
