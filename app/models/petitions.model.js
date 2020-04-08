@@ -99,8 +99,37 @@ exports.getOnePetition = async function (id) {
     }
 };
 
-exports.alterPetition = async function () {
+exports.alterPetition = async function (id, petition) {
+    console.log(">>> Now altering petition....");
+    const conn = await db.getPool().getConnection();
 
+    const petitionData = [
+        petition.title,
+        petition.description,
+        "category",
+        petition.closingDate,
+        id
+    ];
+
+    if ("categoryId" in petition) {
+        petitionData[2] = petition.categoryId;
+        const alterPetitionSQL = "UPDATE Petition SET title = ?, description = ?, category_id = ?, closing_date = ? WHERE petition_id = ?";
+        try {
+            await conn.query(alterPetitionSQL, petitionData);
+        } catch (err) {
+            console.error(`An error occurred when executing alterPetition1: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+            err.hasBeenLogged = true;
+        }
+    } else {
+        petitionData.splice(2, 1);
+        const alterPetitionSQL = "UPDATE Petition SET title = ?, description = ?, closing_date = ? WHERE petition_id = ?";
+        try {
+            await conn.query(alterPetitionSQL, petitionData);
+        } catch (err) {
+            console.error(`An error occurred when executing alterPetition2: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+            err.hasBeenLogged = true;
+        }
+    }
 
 };
 
@@ -189,6 +218,7 @@ exports.getCatName = async function (id) {
     }
 };
 
+//Check this petition exists...
 exports.checkPetitionExists = async function(petitionId) {
     console.log(">>> Checking if this Petition exists......");
     const conn = await db.getPool().getConnection();
@@ -203,6 +233,22 @@ exports.checkPetitionExists = async function(petitionId) {
         }
     } catch (err) {
         console.error(`An error occurred while executing checkPetitionExists: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
+};
+
+//Get the author_id from the petition_id given
+exports.getAuthIdByPetition = async function (id) {
+    console.log(">>> Get the auth_id of the given petition......");
+    const conn = await db.getPool().getConnection();
+    const getAuthIdSQL = "SELECT author_id FROM Petition WHERE petition_id = ?";
+
+    try {
+        const [result] = await conn.query(getAuthIdSQL, [id]);
+        conn.release();
+        return result[0].author_id;
+    } catch (err) {
+        console.error(`An error occurred while executing getAuthIdByPetition: \n${err.sql} \nERROR: ${err.sqlMessage}`);
         err.hasBeenLogged = true;
     }
 };
