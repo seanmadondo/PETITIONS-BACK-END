@@ -6,10 +6,10 @@ module.exports = function (app) {
         .post(petitions.add);
 
     app.route(app.rootUrl + '/petitions/:id')
-        .get(petitions.retrieve)
+        .get(petitions.retrieveOne)
         .patch(petitions.change)
         .delete(petitions.delete);
 
     app.route(app.rootUrl + '/petitions/categories')
-        .get(petitions.retrieveCat);
+        .get(petitions.getCategories);
 };

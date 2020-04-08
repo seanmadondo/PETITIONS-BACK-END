@@ -149,14 +149,20 @@ exports.deletePetition = async function (id) {
         console.error(`An error occurred when executing deletePetition: \n${err.sql} \nERROR: ${err.sqlMessage}`);
         err.hasBeenLogged = true;
     }
-
-
 };
 
+exports.retrieveCategories = async function () {
+    console.log(">>> Now retrieving all categories from the database....");
+    const conn = db.getPool().getConnection();
+    const retrieveSQL = "SELECT * FROM Category";
 
-exports.retrievePetitions = async function () {
-
-
+    try {
+        const [results] = await conn.query(retrieveSQL);
+        return results[0];
+    } catch (err) {
+        console.error(`An error occurred when executing retrievePetitions: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
 };
 
 //_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+

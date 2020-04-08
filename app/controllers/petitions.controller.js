@@ -137,7 +137,7 @@ exports.add = async function(req, res){
 
 };
 
-exports.retrieve = async function(req, res){
+exports.retrieveOne = async function(req, res){
     console.log("\n>>> Request to get detailed information about a petition........");
 
 
@@ -245,10 +245,15 @@ exports.delete = async function(req, res){
     const authorOfPetition = await petitions.getAuthIdByPetition(req.params.id);
     const getUserIdFromToken = await authenticator.getUserFromAuth(authToken);
     if (authorOfPetition === getUserIdFromToken) {
-        await petitions.deletePetition(req.params.id);
-        res.statusMessage = "OK";
-        res.status(200)
-            .send();
+        try {
+            await petitions.deletePetition(req.params.id);
+            res.statusMessage = "OK";
+            res.status(200)
+                .send();
+        } catch (err) {
+            res.status(500)
+                .send(`ERROR Deleting a Petition: ${err}`);
+        }
     } else {
         res.statusMessage = "Forbidden";
         res.status(403)
@@ -256,8 +261,16 @@ exports.delete = async function(req, res){
     }
 };
 
-exports.retrieveCat = async function(req, res){
+exports.getCategories = async function(req, res){
+    console.log("\n>>> Request to get data about Petition Categories....");
 
-
-
+    try {
+        const categories = await petitions.retrieveCategories();
+        res.statusMessage = "OK";
+        res.status(200)
+            .json(categories);
+    } catch (err) {
+        res.status(500)
+            .send(`ERROR Retrieving Categories: ${err}`);
+    }
 };
