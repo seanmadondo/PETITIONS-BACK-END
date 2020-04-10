@@ -45,7 +45,7 @@ exports.getFilteredPetitions = async function (queryParams) {
 
     //construct the WHERE CLAUSE
     if ("q" in queryParams) {
-        whereClause.push("title like % ? %");
+        whereClause.push("title LIKE '%'" + " ? '%'");
         dataList.push(queryParams.q);
     }
     if ("categoryId" in queryParams) {
@@ -67,6 +67,9 @@ exports.getFilteredPetitions = async function (queryParams) {
     if ("count" in queryParams) {
         limitClause.push("?");
         dataList.push(parseInt(queryParams.count));
+    } else {
+        limitClause.push("?");
+        dataList.push(10000);
     }
 
     //construct OFFSET Clause
