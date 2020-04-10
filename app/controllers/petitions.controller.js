@@ -9,55 +9,10 @@ exports.view = async function(req, res){
 
     if ("startIndex" in req.query || "count" in req.query || "q" in req.query || "categoryId" in req.query || "authorId" in req.query || "sortBy" in req.query) {
         try {
-            const petitionInfo = await petitions.getAllPetitions();
-            let filteredSet = new Set();
-
-            //Filter out results.......
-            if ("authorId" in req.query) {
-                let authName = await user.getAuthName(req.query.authorId);
-                for (let i = 0; i < petitionInfo.length; i++) {
-                    if(authName === petitionInfo[i].authorName) {
-                        filteredSet.add(petitionInfo[i]);
-                    }
-                }
-            }
-            if ("categoryId" in req.query) {
-                let catName = await petitions.getCatName(req.query.categoryId);
-                for (let i = 0; i < petitionInfo.length; i++) {
-                    if (catName === petitionInfo[i].category) {
-                        filteredSet.add(petitionInfo[i]);
-
-                    }
-                }
-            }
-            if ("q" in req.query) {
-                for (let i = 0; i < petitionInfo.length; i++) {
-                    let lowerCaseTitle = petitionInfo[i].title.toLocaleLowerCase();
-                    if (lowerCaseTitle.includes(req.query.q.toLocaleLowerCase())) {
-                        filteredSet.add(petitionInfo[i]);
-                    }
-                }
-            }
-
-            //Convert Set back to list after duplicates removed.
-            let filteredList = Array.from(filteredSet);
-            console.log(filteredList);
-
-            //Sort the list by the given parameters......
-            if ("sortBy" in req.query) {
-                if (req.params.sortBy === "ALPHABETICAL_ASC") {
-
-                } else if (req.params.sortBy === "ALPHABETICAL_DESC") {
-
-                } else if (req.params.sortBy === "SIGNATURES_ASC") {
-
-                } else {
-
-                }
-            }
-
-            //Paginate with startIndex and Count.....
-
+            let petitionInfo = await petitions.getFilteredPetitions(req.query);
+            res.statusMessage = "Success";
+            res.status(200)
+                .json(petitionInfo);
 
         } catch (err) {
             res.status(500)

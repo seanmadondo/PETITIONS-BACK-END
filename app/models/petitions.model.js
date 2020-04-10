@@ -34,6 +34,96 @@ exports.getAllPetitions = async function () {
     }
 };
 
+exports.getFilteredPetitions = async function (queryParams) {
+    console.log(">>> Getting filtered Petitions from the database......");
+    const connection = await db.getPool().getConnection();
+    let whereClause = [];
+    let orderByClause = [];
+    let limitClause = [];
+    let offSetClause = [];
+    let dataList = [];
+
+    //construct the WHERE CLAUSE
+    if ("q" in queryParams) {
+        whereClause.push("title like % ? %");
+        dataList.push(queryParams.q);
+    }
+    if ("categoryId" in queryParams) {
+        whereClause.push("category_id = ?");
+        dataList.push(parseInt(queryParams.categoryId));
+    }
+    if ("authorId" in queryParams) {
+        whereClause.push("author_id = ?");
+        dataList.push(parseInt(queryParams.authorId));
+    }
+
+    //Construct OrderBy
+    if ("sortBy" in queryParams) {
+        orderByClause.push("?");
+        dataList.push(queryParams.sortBy);
+    }
+
+    // construct Limit Clause
+    if ("count" in queryParams) {
+        limitClause.push("?");
+        dataList.push(parseInt(queryParams.count));
+    }
+
+    //construct OFFSET Clause
+    if ("startIndex" in queryParams) {
+        offSetClause.push("?");
+        dataList.push(parseInt(queryParams.startIndex));
+    }
+
+    let firstLineSQL = "SELECT petition_id, title, category_id, author_id FROM Petition ";
+
+    if (whereClause.length > 0) {
+        let whereClauseSQL = "WHERE " + whereClause.join(' AND ');
+        firstLineSQL += whereClauseSQL;
+    }
+
+    if (orderByClause.length > 0) {
+        let orderByClauseSQL = "\nORDER BY ?";
+        firstLineSQL += orderByClauseSQL;
+    }
+
+    if (limitClause.length > 0) {
+        let limitClauseSQL = "\nLIMIT ?";
+        firstLineSQL += limitClauseSQL;
+    }
+
+    if (offSetClause.length > 0) {
+        let offsetClauseSQL = "\nOFFSET ?";
+        firstLineSQL += offsetClauseSQL;
+    }
+    console.log(firstLineSQL);
+    console.log(dataList);
+
+
+    try {
+        const [petitionDetails] = await connection.query(firstLineSQL, dataList);
+        connection.release();
+        let petitionResults = [];
+
+        for (let i = 0; i < petitionDetails.length; i++) {
+            let authAndCat = await getCatAndAuth(petitionDetails[i].category_id, petitionDetails[i].author_id);
+            petitionResults.push({
+                "petitionId": petitionDetails[i].petition_id,
+                "title": petitionDetails[i].title,
+                "category": authAndCat[1],
+                "authorName": authAndCat[0],
+                "signatureCount": await numSignatures(petitionDetails[i].petition_id)
+            })
+        }
+        return petitionResults;
+
+    } catch (err) {
+        console.error(`An error occurred when executing getFilteredPetitions: \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
+
+};
+
 
 exports.postPetition = async function (user, authId, dateToday) {
     console.log(">>> Executing postPetition to post petition to the database......");
