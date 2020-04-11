@@ -32,6 +32,7 @@ module.exports = function () {
     require('../app/routes/users.photos.routes')(app);
     require('../app/routes/petitions.routes')(app);
     require('../app/routes/petitions.photos.routes')(app);
+    require('../app/routes/petitions.signatures.routes')(app);
 
     return app;
 };
