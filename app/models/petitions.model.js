@@ -99,9 +99,6 @@ exports.getFilteredPetitions = async function (queryParams) {
         let offsetClauseSQL = "\nOFFSET ?";
         firstLineSQL += offsetClauseSQL;
     }
-    console.log(firstLineSQL);
-    console.log(dataList);
-
 
     try {
         const [petitionDetails] = await connection.query(firstLineSQL, dataList);
@@ -341,9 +338,9 @@ exports.checkPetitionExists = async function(petitionId) {
         const [result] = await conn.query(getPetitionSQL, [petitionId]);
         conn.release();
         if (result === [] || result.length === 0) {
-            return 0;                   //false - No User like this in the database!
+            return 0;                   //false - No Petition like this in the database!
         } else {
-            return 1;                   //true - A User like this exists!
+            return 1;                   //true - A Petition like this exists!
         }
     } catch (err) {
         console.error(`An error occurred while executing checkPetitionExists: \n${err.sql} \nERROR: ${err.sqlMessage}`);
