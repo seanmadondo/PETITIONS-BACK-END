@@ -8,19 +8,17 @@ const defaultPhotoDirectory = './storage/default/';
 exports.retrieveSignature = async function (id) {
     console.log(">>> Executing retrieveSignature.....");
     const conn = await db.getPool().getConnection();
-    const getSignSQL = "SELECT petition_id, signed_date FROM Signature WHERE signatory_id = ? ORDER BY signed_date ASC";
+    const getSignSQL = "SELECT signatory_id, signed_date FROM Signature WHERE petition_id = ? ORDER BY signed_date ASC";
 
     try {
         const [results] = await conn.query(getSignSQL, [id]);
         conn.release();
-
         let resultsList = [];
 
         for (let i = 0; i < results.length; i++) {
-            let userDetails = await getAuthorDetails(results[i].petition_id);
-            console.log(userDetails);
+            let userDetails = await getAuthorDetails(results[i].signatory_id);
             resultsList.push ({
-                "signatoryId": id,
+                "signatoryId": results[i].signatory_id,
                 "name": userDetails[0],
                 "city": userDetails[1],
                 "country": userDetails[2],
