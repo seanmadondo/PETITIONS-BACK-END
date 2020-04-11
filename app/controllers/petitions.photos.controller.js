@@ -13,6 +13,7 @@ exports.retrieve = async function (req, res) {
         res.statusMessage = 'Petition Not Found!';
         res.status(404)
             .send();
+        return;
     }
 
     try {
@@ -51,6 +52,7 @@ exports.set = async function (req, res) {
         res.statusMessage = 'Not Found!';
         res.status(404)
             .send();
+        return;
     }
 
     //Check to see if user has included auth token
@@ -58,6 +60,7 @@ exports.set = async function (req, res) {
         res.statusMessage = "Unauthorised!";
         res.status(401)
             .send();
+        return;
     }
 
     // Check photo file extension
