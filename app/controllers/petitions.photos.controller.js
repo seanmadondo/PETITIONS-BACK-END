@@ -58,7 +58,7 @@ exports.set = async function (req, res) {
     //Check to see if user has included auth token
     if (authToken === "") {
         res.statusMessage = "Unauthorised!";
-        res.status(401)
+        res.status(403)
             .send();
         return;
     }
@@ -99,7 +99,7 @@ exports.set = async function (req, res) {
         }
     } else {
             res.statusMessage = "Forbidden";
-            res.status(403)
+            res.status(401)
                 .send();
     }
 };
