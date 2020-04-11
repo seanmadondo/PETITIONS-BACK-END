@@ -10,13 +10,14 @@ exports.retrieve = async function (req, res) {
     //Check if petition exists...
     const checkPetitionExists = await petition.checkPetitionExists(petitionId);
     if (checkPetitionExists === 0) {
-        res.statusMessage = 'Not Found!';
+        res.statusMessage = 'Petition Not Found!';
         res.status(404)
             .send();
     }
 
     try {
-        const filename = await petitionPhoto.retrievePhoto(petitionId);
+        const filename = await petitionPhoto.getPetitionPhotoFilename(petitionId);
+        //console.log(filename);
         if (filename === null) {
             res.statusMessage = 'Not Found!';
             res.status(404)
