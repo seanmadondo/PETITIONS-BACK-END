@@ -7,10 +7,10 @@ exports.retrieve = async function (req, res) {
     console.log("\n>>> Request to retrieve a Petition photo from the database.....");
     const petitionId = req.params.id;
 
-    //Check if petition exists...
+    //Check if this petition exists
     const checkPetitionExists = await petition.checkPetitionExists(petitionId);
     if (checkPetitionExists === 0) {
-        res.statusMessage = 'Petition Not Found!';
+        res.statusMessage = 'Not Found';
         res.status(404)
             .send();
         return;
