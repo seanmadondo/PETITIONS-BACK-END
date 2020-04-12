@@ -35,8 +35,20 @@ exports.retrieveSignature = async function (id) {
 };
 
 
-exports.signPetition = async function () {
+exports.signPetition = async function (authId, petitionId, dateToday) {
+    console.log(">>> Executing signPetition.....");
+    const conn = await db.getPool().getConnection();
+    const signSQL = "INSERT INTO Signature (signatory_id, petition_id, signed_date) VALUES (?,?,?)";
+    let info = [authId, petitionId, dateToday];
 
+    try {
+        await conn.query(signSQL, info);
+        conn.release();
+
+    } catch (err) {
+        console.error(`An error occurred when executing signPetition : \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
 
 
 };

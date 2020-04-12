@@ -63,7 +63,6 @@ exports.checkAuthToken = async function(authId) {
 
 //_+_++_+_+_+_+_+_+_+_+_+_+_+_ CHECK AUTH TOKEN - RETURN user_id _+_+_+_+_+_+_+_+_+_++_+_+_+
 exports.getUserFromAuth = async function(authId) {
-    console.log("\nGetting user_id from auth_token......");
     const conn = await db.getPool().getConnection();
     const findUserSQL = 'SELECT user_id FROM User WHERE auth_token = ?';
     try {
