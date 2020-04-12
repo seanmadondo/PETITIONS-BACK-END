@@ -135,6 +135,7 @@ exports.change = async function(req, res){
             res.statusMessage = "Bad Request";
             res.status(400)
                 .send();
+            return;
         }
     }
 
@@ -146,6 +147,7 @@ exports.change = async function(req, res){
             res.statusMessage = "Invalid category";
             res.status(400)
                 .send();
+            return;
         }
     }
 
@@ -187,6 +189,7 @@ exports.delete = async function(req, res){
         res.statusMessage = "Not Found";
         res.status(404)
             .send();
+        return;
     }
 
     //Check to see if user has included auth token
@@ -194,6 +197,7 @@ exports.delete = async function(req, res){
         res.statusMessage = "Unauthorised!";
         res.status(401)
             .send();
+        return;
     }
 
     //check that this petition has an author_id that matches with user_id of the editor

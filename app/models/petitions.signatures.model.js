@@ -50,11 +50,22 @@ exports.signPetition = async function (authId, petitionId, dateToday) {
         err.hasBeenLogged = true;
     }
 
-
 };
 
 
-exports.removeSignature = async  function() {
+exports.removeSignature = async  function(authId) {
+    console.log(">>> Executing removeSignature.....");
+    const conn = await db.getPool().getConnection();
+    const removeSQL = "DELETE FROM Signature WHERE signatory_id = ?";
+
+    try {
+        await conn.query(removeSQL, [authId]);
+        conn.release()
+
+    } catch (err) {
+        console.error(`An error occurred when executing removeSignature : \n${err.sql} \nERROR: ${err.sqlMessage}`);
+        err.hasBeenLogged = true;
+    }
 
 };
 
