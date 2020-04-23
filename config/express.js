@@ -15,6 +15,7 @@ module.exports = function () {
     app.use(bodyParser.raw({ type: 'image/jpeg' }));
     app.use(bodyParser.raw({ type: 'image/png' }));
     app.use(bodyParser.raw({ type: 'image/gif' }));
+    app.use(bodyParser.raw({ type: 'image/bmp' }));
 
     // DEBUG (you can remove these)
     app.use((req, res, next) => {
