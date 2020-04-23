@@ -43,7 +43,7 @@ exports.checkIdByAuthToken = async function(id, authId) {
 
 //_+_+_+_+_+++_++_+_+_+  Check Auth token exists +_+_+_+_+_++_+_+_+_+_+_+_+_+
 exports.checkAuthToken = async function(authId) {
-    console.log("\nCheck if user auth token exists.....")
+    console.log("\nCheck if user auth token exists.....");
     const conn = await db.getPool().getConnection();
     const findAuthToken = 'SELECT user_id FROM User WHERE auth_token = ?';
     try {

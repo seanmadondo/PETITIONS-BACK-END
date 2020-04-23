@@ -249,6 +249,7 @@ exports.retrieveCategories = async function () {
 
     try {
         const [results] = await conn.query(retrieveSQL);
+        conn.release();
         return results[0];
     } catch (err) {
         console.error(`An error occurred when executing retrievePetitions: \n${err.sql} \nERROR: ${err.sqlMessage}`);

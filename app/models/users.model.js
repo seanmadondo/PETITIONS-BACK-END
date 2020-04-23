@@ -31,6 +31,8 @@ exports.register = async function (user) {
     //Check email does not already exist on DB
     const emailQuery = 'select * from User where email = ?';
     const [emailStatus] = await conn.query(emailQuery, [user.email]);
+    conn.release();
+
     if ( emailStatus !== '') {
         try {
             const [result] = await conn.query(insertQuery, userData);
@@ -197,6 +199,7 @@ exports.change = async function (id, user) {
 
     try {
         await conn.query(updateSQL, userData);
+        conn.release()
     } catch (err) {
         console.error(`An error occurred when executing CHANGE : \n${err.sql} \nERROR: ${err.sqlMessage}`);
         err.hasBeenLogged = true;
