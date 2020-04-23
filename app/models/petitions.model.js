@@ -115,6 +115,7 @@ exports.getFilteredPetitions = async function (queryParams) {
                 "signatureCount": await numSignatures(petitionDetails[i].petition_id)
             })
         }
+
         return petitionResults;
 
     } catch (err) {
