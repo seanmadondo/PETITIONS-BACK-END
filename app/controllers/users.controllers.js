@@ -2,7 +2,7 @@ const user = require('../models/users.model');
 const passwords = require('../passwords');
 
 
-//Check email address is valid
+//Check email address is.
 function checkEmailValidity(email) {
     return email.includes('@');
 }
